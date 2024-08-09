@@ -6,9 +6,7 @@ This is a simple web application that detects emotions in text using OpenAI's GP
 
 - Installation
 - Usage
-- Project Structure
 - API Endpoints
-- Customization
 - Contributing
 - License
 
@@ -27,15 +25,12 @@ This is a simple web application that detects emotions in text using OpenAI's GP
 ```
 git clone https://github.com/nickklos10/NLP-emotion-detecion.git
 cd NLP-emotion-detecion
-
 ```
 
 2. Create a virtual environment (optional but recommended):
 ```
-
 python -m venv venv
 source venv/bin/activate  # On Windows use `venv\Scripts\activate`
-
 ```
 
 3. Export your API key as an environment variable:
@@ -43,19 +38,16 @@ source venv/bin/activate  # On Windows use `venv\Scripts\activate`
 For macOS:
 ```
 export OPENAI_API_KEY='your-api-key-here'
-
 ```
 
 For Windows:
 ```
 set OPENAI_API_KEY=your-api-key-here
-
 ```
 
 4. Run the Flask application:
 ```
 python server.py
-
 ```
 
 ### Usage
