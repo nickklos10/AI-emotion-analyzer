@@ -49,6 +49,10 @@ set OPENAI_API_KEY=your-api-key-here
 ```
 python server.py
 ```
+5. Access the web app:
+
+Open your browser and go to http://127.0.0.1:4000 to start using the app.
+
 
 ### Usage
 
