@@ -1,6 +1,6 @@
 # NLP Emotion Detection Web App
 
-This is a simple web application that detects emotions in text using OpenAI's GPT-4o-mini model. The app is built with Flask for the backend and HTML/CSS/JavaScript for the frontend. It allows users to input text, analyzes the sentiment, and returns the likelihood of each emotion as a percentage.
+This is a web application that detects emotions in text using OpenAI's GPT-4o-mini model. The app is built with Flask for the backend and HTML/CSS/JavaScript for the frontend. It allows users to input text, analyzes the sentiment, and returns the likelihood of each emotion as a percentage.
 
 ### Table of Contents
 
