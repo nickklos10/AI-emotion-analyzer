@@ -19,6 +19,11 @@ This is a simple web application that detects emotions in text using OpenAI's GP
 * pip (Python package installer)
 * Git
 
+**Requirements**
+```
+pip install flask flask-cors openai
+```
+
 **Steps**
 
 1. Clone the repository:
