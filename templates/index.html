@@ -1,32 +1,442 @@
-<html>
-<head>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <script src="static/mywebscript.js"></script>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Emotion Analyzer</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link href="https://fonts.cdnfonts.com/css/petitinho" rel="stylesheet" />
+
     <style>
-        .center-heading {
-            text-align: center;
+      @import url("https://fonts.cdnfonts.com/css/petitinho");
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        font-family: "Outfit", sans-serif;
+        color: #fff;
+        background-color: #0a0a0a;
+        overflow-y: auto;
+      }
+
+      #network-canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1;
+      }
+
+      .content-wrapper {
+        position: relative;
+        z-index: 2;
+        width: 100%;
+        max-width: 1000px;
+        padding: 20px;
+        margin: 40px auto;
+        min-height: calc(100vh - 80px);
+        display: flex;
+        align-items: center;
+      }
+
+      .main-container {
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 30px;
+        padding: 3rem;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        position: relative;
+        overflow: hidden;
+        width: 100%;
+      }
+
+      .main-container::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.2),
+          transparent
+        );
+      }
+
+      .header-section {
+        text-align: center;
+        margin-bottom: 3rem;
+        position: relative;
+      }
+
+      .main-title {
+        font-size: 3.5rem;
+        font-family: "Petitinho", sans-serif;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, #00ffcc, #00ff95);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 0 0 30px rgba(0, 255, 204, 0.3);
+      }
+
+      .subtitle {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 1.2rem;
+        font-weight: 300;
+        font-family: "Petitinho", sans-serif;
+        max-width: 600px;
+        margin: 0 auto;
+      }
+
+      .input-container {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.3s ease;
+        width: 92.5%;
+      }
+
+      .input-container:hover {
+        background: rgba(255, 255, 255, 0.07);
+        transform: translateY(-2px);
+      }
+
+      .custom-textarea {
+        width: 100%;
+        min-height: 150px;
+        max-width: 100%;
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        padding: 1.5rem;
+        color: #fff;
+        font-family: "Petitinho", sans-serif;
+        font-size: 0.9rem;
+        resize: none;
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+      }
+
+      .custom-textarea:focus {
+        outline: none;
+        border-color: #00ffcc;
+        box-shadow: 0 0 20px rgba(0, 255, 204, 0.2);
+        background: rgba(0, 0, 0, 0.4);
+      }
+
+      .custom-textarea::placeholder {
+        color: rgba(255, 255, 255, 0.4);
+      }
+
+      .button-container {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        margin-top: 1rem;
+      }
+
+      .analyze-btn {
+        background: linear-gradient(135deg, #00ffcc, #00ff95);
+        color: #000;
+        font-weight: 600;
+        font-size: 1.2rem;
+        padding: 1rem 3rem;
+        border: none;
+        border-radius: 12px;
+        font-family: "Petitinho", sans-serif;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin: 0 auto;
+      }
+
+      .analyze-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(0, 255, 204, 0.3);
+      }
+
+      .analyze-btn:active {
+        transform: translateY(1px);
+      }
+
+      .result-container {
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 20px;
+        padding: 2rem;
+        margin-top: 2rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .result-title {
+        color: #00ffcc;
+        font-size: 1.5rem;
+        font-family: "Petitinho", sans-serif;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        text-align: center;
+      }
+
+      #system_response {
+        color: #fff;
+        font-size: 1rem;
+        line-height: 1.6;
+        text-align: center;
+        font-family: "Petitinho", sans-serif;
+        min-height: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .loading {
+        display: none;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+
+      .loading-spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid rgba(0, 255, 204, 0.1);
+        border-left-color: #00ffcc;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      .glow {
+        position: absolute;
+        width: 100px;
+        height: 100px;
+        background: radial-gradient(
+          circle,
+          rgba(0, 255, 204, 0.2),
+          transparent 70%
+        );
+        border-radius: 50%;
+        pointer-events: none;
+      }
+
+      @keyframes spin {
+        100% {
+          transform: rotate(360deg);
         }
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (max-width: 768px) {
+        .content-wrapper {
+          padding: 10px;
+          margin: 20px auto;
+        }
+
+        .main-container {
+          padding: 1.5rem;
+        }
+
+        .main-title {
+          font-size: 2.5rem;
+        }
+
+        .custom-textarea {
+          min-height: 120px;
+        }
+
+        .analyze-btn {
+          width: 100%;
+          padding: 1rem;
+        }
+      }
     </style>
-</head>
-<body>
-    <div class="card">
-        <div class="card-body">
-            <h1 class="center-heading">NLP - Emotion Detection</h1> 
-            <div style="padding: 25px 25px 25px 25px;">
-            <h2 class="mb-3">
-                <label class="form-label">Please enter the text to be analyzed</label>
-                <input type="textarea" class="form-control" id="textToAnalyze">
-            </h2>
+  </head>
+  <body>
+    <canvas id="network-canvas"></canvas>
 
-            <div style="padding: 25px 25px 25px 25px;">
-                <button onclick="RunSentimentAnalysis()" class="btn btn-secondary">Run Sentiment Analysis</button>
-            </div>
-            <div style="padding: 25px 25px 25px 25px;"></div>
-            <h2 class="mb-3">
-                <label class="form-label">Result of Emotion Detection</label>
-            </h2>
-
-            <div id="system_response" style="padding: 25px 25px 25px 25px;"></div>
+    <div class="content-wrapper">
+      <div class="main-container">
+        <div class="header-section">
+          <h1 class="main-title">AI Emotion Analyzer</h1>
+          <p class="subtitle">
+            Discover the emotional undertones in your text using AI
+          </p>
         </div>
+
+        <div class="input-container">
+          <textarea
+            class="custom-textarea"
+            id="textToAnalyze"
+            placeholder="Enter your text here to analyze its emotional content..."
+          ></textarea>
+          <div class="button-container">
+            <button onclick="RunSentimentAnalysis()" class="analyze-btn">
+              Analyze Emotions
+            </button>
+          </div>
+        </div>
+
+        <div class="result-container">
+          <h3 class="result-title">Analysis Results</h3>
+          <div class="loading" id="loading">
+            <div class="loading-spinner"></div>
+          </div>
+          <div id="system_response">Your analysis results will appear here</div>
+        </div>
+      </div>
     </div>
-</body>
+
+    <script>
+      // Network background animation
+      const canvas = document.getElementById("network-canvas");
+      const ctx = canvas.getContext("2d");
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const nodes = [];
+      const maxNodes = 150;
+      const maxDistance = 150;
+
+      class Node {
+        constructor(x, y) {
+          this.x = x;
+          this.y = y;
+          this.vx = (Math.random() - 0.5) * 1.5;
+          this.vy = (Math.random() - 0.5) * 1.5;
+          this.size = Math.random() * 2 + 1;
+        }
+
+        update() {
+          this.x += this.vx;
+          this.y += this.vy;
+          if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+          if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+        }
+
+        draw() {
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.fillStyle = "#00ffcc";
+          ctx.fill();
+        }
+      }
+
+      for (let i = 0; i < maxNodes; i++) {
+        nodes.push(
+          new Node(Math.random() * canvas.width, Math.random() * canvas.height)
+        );
+      }
+
+      function drawConnections() {
+        for (let i = 0; i < nodes.length; i++) {
+          for (let j = i + 1; j < nodes.length; j++) {
+            const dx = nodes[i].x - nodes[j].x;
+            const dy = nodes[i].y - nodes[j].y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            if (distance < maxDistance) {
+              ctx.beginPath();
+              ctx.moveTo(nodes[i].x, nodes[i].y);
+              ctx.lineTo(nodes[j].x, nodes[j].y);
+              const opacity = (1 - distance / maxDistance) * 0.5;
+              ctx.strokeStyle = `rgba(0, 255, 204, ${opacity})`;
+              ctx.lineWidth = 1;
+              ctx.stroke();
+            }
+          }
+        }
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "rgba(10, 10, 10, 0.1)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        for (const node of nodes) {
+          node.update();
+          node.draw();
+        }
+        drawConnections();
+        requestAnimationFrame(animate);
+      }
+
+      animate();
+
+      window.addEventListener("resize", () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      });
+
+      // Glow effect
+      const glow = document.createElement("div");
+      glow.className = "glow";
+      document.body.appendChild(glow);
+
+      document.addEventListener("mousemove", (e) => {
+        glow.style.left = e.pageX - 50 + "px";
+        glow.style.top = e.pageY - 50 + "px";
+      });
+
+      // Emotion analysis function
+      function RunSentimentAnalysis() {
+        const textToAnalyze = document.getElementById("textToAnalyze").value;
+        const loadingElement = document.getElementById("loading");
+        const responseElement = document.getElementById("system_response");
+
+        if (!textToAnalyze.trim()) {
+          responseElement.innerHTML = "Please enter some text to analyze";
+          return;
+        }
+
+        loadingElement.style.display = "block";
+        responseElement.style.opacity = "0.3";
+
+        let xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+          if (this.readyState == 4) {
+            loadingElement.style.display = "none";
+            responseElement.style.opacity = "1";
+
+            if (this.status == 200) {
+              responseElement.innerHTML = xhttp.responseText;
+              responseElement.style.animation = "fadeIn 0.5s ease-in-out";
+            } else {
+              responseElement.innerHTML =
+                "An error occurred while analyzing the text. Please try again.";
+            }
+          }
+        };
+
+        xhttp.open(
+          "GET",
+          "emotionDetector?textToAnalyze=" + encodeURIComponent(textToAnalyze),
+          true
+        );
+        xhttp.send();
+      }
+    </script>
+  </body>
+</html>
