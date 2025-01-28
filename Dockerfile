@@ -3,8 +3,11 @@ FROM python:3.11
 # Set the working directory
 WORKDIR /app
 
-# Copy the current directory contents into the container at /app
-COPY . /app
+# Copy only the necessary files into the container
+COPY requirements.txt /app/
+COPY server.py /app/
+COPY templates /app/templates/
+COPY EmotionDetection /app/EmotionDetection/
 
 # Install dependencies
 RUN apt-get update && apt-get install -y python3-distutils
