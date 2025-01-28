@@ -8,6 +8,9 @@ Author(Learner): [Nicholas Klos]
 
 from flask import Flask, render_template, request, jsonify
 from EmotionDetection.emotion_detection import emotion_detector, emotion_predictor
+import os
+
+port = int(os.environ.get("PORT", 4000))
 
 app = Flask("Emotion Detection")
 
@@ -15,7 +18,8 @@ def run_emotion_detection():
     """
     Main function to run the Emotion Detection application.
     """
-    app.run(host="0.0.0.0", port=4000)
+    print(f"🚀 Server starting on port {port}...")
+    app.run(host="0.0.0.0", port=port)
 
 @app.route("/emotionDetector", methods=["GET", "POST"])
 def sent_detector():
