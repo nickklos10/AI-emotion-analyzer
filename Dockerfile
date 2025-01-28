@@ -1,17 +1,19 @@
-FROM python:3.11 
+FROM python:3.10
 
-# Set the working directory
+
 WORKDIR /app
 
-# Copy only the necessary files into the container
+RUN apt-get update && apt-get install -y \
+    python3-venv \
+    libatlas-base-dev \
+    libopenblas-dev
+
 COPY requirements.txt /app/
-COPY server.py /app/
-COPY templates /app/templates/
-COPY EmotionDetection /app/EmotionDetection/
 
-# Install dependencies
-RUN apt-get update && apt-get install -y python3-distutils
-RUN pip install -r requirements.txt
+RUN pip install --upgrade pip setuptools wheel
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Command to run the application
+COPY . /app/
+
 CMD ["python", "server.py"]
+
